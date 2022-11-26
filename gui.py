@@ -9,10 +9,12 @@ def main_gui():
     layout = [
         [sg.Text('Welcome to MUDEK Evaluation Tool!', font=('Times New Roman', 19, 'bold'))],
         [sg.Text('Input Dir Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(default_text='inputs/', key='-IN-'), sg.FolderBrowse(initial_folder='inputs/')],
-        [sg.Text('Student IDs Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(default_text='resources/Student-ids.xlsx', key='-IN_STD-'), sg.FileBrowse(initial_folder='resources/Student-ids.xlsx', file_types=(("Excel Files", "*.xlsx"),))],
+        [sg.Text('Student IDs Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(default_text='resources/Student-ids-with-names.xlsx', key='-IN_STD-'), sg.FileBrowse(initial_folder='resources/Student-ids-with-names.xlsx', file_types=(("Excel Files", "*.xlsx"),))],
         [sg.Text('Output Dir Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(default_text='outputs/', key='-OUT-'), sg.FolderBrowse(initial_folder='outputs/')],
         [sg.Button('Generate Report', s=51)],
         [sg.Button('All Program Sub-Outcome Grades of a Student Above 3', s=51)],
+        [sg.Button('List All Sub-Outcomes Under 3 Average by Students', s=51)],
+        [sg.Button('Min of All Sub-Outcomes by Lectures', s=51)],
         [sg.Button('Average of Program Sub-Outcomes by Lectures', s=51)],
         [sg.Button('Courses with a Sub-Outcome Average Below 3', s=51)],
         [sg.Exit(button_color='tomato', s=51)]
@@ -43,9 +45,19 @@ def main_gui():
             sg.popup('Report generated, you can continue with desired query(s).', font=('Times New Roman', 19, 'bold'))
 
         elif event == 'All Program Sub-Outcome Grades of a Student Above 3':
-            res_1 = mp.list_students_under_3_avg(report_file=f"{values['-OUT-']}output-report.xlsx", outputs_path=values['-OUT-'])
+            res_1 = mp.list_students_above_3_avg(report_file=f"{values['-OUT-']}output-report.xlsx", student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
             sg.popup_scrolled(res_1, title="All Program Sub-Outcome Grades of a Student Above 3")
             sg.popup(f'\"All Program Sub-Outcome Grades of a Student Above 3\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
+
+        elif event == 'List All Sub-Outcomes Under 3 Average by Students':
+            res_1 = mp.list_all_sub_outcomes_under_3_avg_by_students(report_file=f"{values['-OUT-']}output-report.xlsx", student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
+            sg.popup_scrolled(res_1, title="List All Sub-Outcomes Under 3 Average by Students")
+            sg.popup(f'\"List All Sub-Outcomes Under 3 Average by Students\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
+
+        elif event == 'Min of All Sub-Outcomes by Lectures':
+            res_1 = mp.min_of_all_sub_outcomes_by_lectures(report_file=f"{values['-OUT-']}output-report.xlsx", outputs_path=values['-OUT-'])
+            sg.popup_scrolled(res_1, title="Min of All Sub-Outcomes by Lectures")
+            sg.popup(f'\"Min of All Sub-Outcomes by Lectures\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
 
         elif event == 'Average of Program Sub-Outcomes by Lectures':
             res_2 = mp.avg_of_all_sub_outcomes_by_lectures(report_file=f"{values['-OUT-']}output-report.xlsx", outputs_path=values['-OUT-'])

@@ -27,6 +27,7 @@ def parse_grades_excels(grades_file:str):
 
 def generate_empty_report_df(sub_outcome_df:pd.DataFrame, student_ids_excel:str=None):
     student_id_df = pd.read_excel(student_ids_excel, index_col='Öğrenci No')
+    student_id_df.drop(student_id_df.columns.difference(['Öğrenci No']), axis=1, inplace=True)
 
     sub_outcome_df['Alt-Çıktı No'] = pd.Series(sub_outcome_df['Alt-Çıktı No']).fillna(method='ffill')
     sub_outcome_df.dropna(how='any', inplace=True)
@@ -65,7 +66,7 @@ def fill_report_df(df_list:list=None, output_df:pd.DataFrame=None, outputs_path:
     return output_df
 
 
-def assemble_report_file(inputs_path:str='inputs/', student_ids_excel:str='resources/Student-ids.xlsx', outputs_path:str="outputs/"):
+def assemble_report_file(inputs_path:str='inputs/', student_ids_excel:str='resources/Student-ids-with-names.xlsx', outputs_path:str="outputs/"):
     final_df = None
     for input_file in os.listdir(inputs_path):
         if input_file.endswith('.xlsx'):
@@ -87,8 +88,7 @@ def assemble_report_file(inputs_path:str='inputs/', student_ids_excel:str='resou
     return final_df
 
 
-def list_students_under_3_avg(report_file:str='outputs/output-report.xlsx', outputs_path:str="outputs/"):
-    # TODO: To be continued depending on what exactly the query is !!!
+def list_students_above_3_avg(report_file:str='outputs/output-report.xlsx', student_ids_excel='resources/Student-ids-with-names.xlsx', outputs_path:str="outputs/"):
     output_df = pd.read_excel(report_file, index_col='Öğrenci No')
     transposed_output_df = output_df.replace(to_replace='B', value=5.0)
 
@@ -96,11 +96,57 @@ def list_students_under_3_avg(report_file:str='outputs/output-report.xlsx', outp
     transposed_output_df = transposed_output_df.mean().dropna()
 
     for row in transposed_output_df.index:
-        if transposed_output_df[row] > 3:
+        if transposed_output_df[row] < 3:
             transposed_output_df.drop(labels=row, inplace=True)
 
-    transposed_output_df.to_excel(f'{outputs_path}list_of_students_under_3_avg.xlsx')
-    return transposed_output_df
+    transposed_output_df = pd.DataFrame(transposed_output_df)
+    student_ids_df = pd.read_excel(student_ids_excel).set_index('Öğrenci No')
+
+    merged_df = student_ids_df.merge(transposed_output_df, left_index=True, right_index=True)
+
+    merged_df.to_excel(f'{outputs_path}list_of_students_above_3_avg.xlsx')
+    return merged_df
+
+
+def list_all_sub_outcomes_under_3_avg_by_students(report_file:str='outputs/output-report.xlsx', student_ids_excel='resources/Student-ids-with-names.xlsx', outputs_path:str="outputs/"):
+    output_df = pd.read_excel(report_file, index_col='Öğrenci No')
+    output_df = output_df.replace(to_replace='B', value=5.0)
+
+    final_df = output_df.groupby(lambda x: x.split("-")[0], axis=1).mean()
+    final_df = final_df[final_df < 3]
+    final_df = pd.DataFrame(final_df).dropna(how='all', axis=1).dropna(how='all', axis=0)
+
+    student_ids_df = pd.read_excel(student_ids_excel).set_index('Öğrenci No')
+    merged_df = student_ids_df.merge(final_df, left_index=True, right_index=True)
+
+    merged_df.to_excel(f'{outputs_path}list_all_sub_outcomes_under_3_avg_by_students.xlsx')
+    return merged_df
+
+
+def min_of_all_sub_outcomes_by_lectures(report_file:str='outputs/output-report.xlsx', outputs_path:str="outputs/"):
+    output_df = pd.read_excel(report_file, index_col='Öğrenci No')
+    output_df = output_df.replace(to_replace='B', value=5.0)
+
+    set_of_lecs = set()
+    set_of_outcomes = set()
+    lec_oc_val_dict = dict()
+
+    for col in output_df.columns:
+        x = re.search(r'([0-9]+[a-z]{1})-(CSE[0-9]{3}|GBE[0-9]{3})', col)
+        set_of_lecs.add(x.group(2))
+        set_of_outcomes.add(x.group(1))
+        lec_oc_val_dict[x.group(0)] = output_df[col].min()
+
+    result_df = pd.DataFrame(index=list(set_of_outcomes), columns=list(set_of_lecs))
+
+    for i in result_df.index:
+        for c in result_df.columns:
+            for key, val in lec_oc_val_dict.items():
+                if i in key and c in key:
+                    result_df.at[i, c] = val
+
+    result_df.to_excel(f'{outputs_path}min_of_all_sub_outcomes_by_lectures.xlsx')
+    return result_df
 
 
 def avg_of_all_sub_outcomes_by_lectures(report_file:str='outputs/output-report.xlsx', outputs_path:str="outputs/"):

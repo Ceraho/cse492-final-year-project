@@ -73,12 +73,10 @@ def assemble_report_file(inputs_path:str='inputs/', student_ids_excel:str='resou
             grades_file = os.path.join(inputs_path, input_file)
 
             sub_outcome_df, df_list = parse_grades_excels(grades_file=grades_file)
-
             if os.path.exists(f'{outputs_path}output-report.xlsx'):
                 output_df = pd.read_excel(f'{outputs_path}output-report.xlsx', index_col='Öğrenci No')
             else:
                 output_df = generate_empty_report_df(sub_outcome_df=sub_outcome_df, student_ids_excel=student_ids_excel)
-
             final_df = fill_report_df(df_list=df_list, output_df=output_df, outputs_path=outputs_path)
 
             print(f"+++++++++ {grades_file} WAS PARSED SUCCESSFULLY +++++++++\n")
@@ -103,6 +101,7 @@ def list_students_above_3_avg(report_file:str='outputs/output-report.xlsx', stud
     student_ids_df = pd.read_excel(student_ids_excel).set_index('Öğrenci No')
 
     merged_df = student_ids_df.merge(transposed_output_df, left_index=True, right_index=True)
+    merged_df.rename(columns={0: 'Averages'}, inplace=True)
 
     merged_df.to_excel(f'{outputs_path}list_of_students_above_3_avg.xlsx')
     return merged_df

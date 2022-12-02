@@ -12,7 +12,7 @@ def main_gui():
         [sg.Text('Student IDs Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(default_text='resources/Student-ids-with-names.xlsx', key='-IN_STD-'), sg.FileBrowse(initial_folder='resources/Student-ids-with-names.xlsx', file_types=(("Excel Files", "*.xlsx"),))],
         [sg.Text('Output Dir Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(default_text='outputs/', key='-OUT-'), sg.FolderBrowse(initial_folder='outputs/')],
         [sg.Button('Generate Report', s=51)],
-        [sg.Button('All Program Sub-Outcome Grades of a Student Above 3', s=51)],
+        [sg.Button('List of Students Above 3 Average', s=51)],
         [sg.Button('List All Sub-Outcomes Under 3 Average by Students', s=51)],
         [sg.Button('Min of All Sub-Outcomes by Lectures', s=51)],
         [sg.Button('Average of Program Sub-Outcomes by Lectures', s=51)],
@@ -44,10 +44,10 @@ def main_gui():
 
             sg.popup('Report generated, you can continue with desired query(s).', font=('Times New Roman', 19, 'bold'))
 
-        elif event == 'All Program Sub-Outcome Grades of a Student Above 3':
+        elif event == 'List of Students Above 3 Average':
             res_1 = mp.list_students_above_3_avg(report_file=f"{values['-OUT-']}output-report.xlsx", student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
-            sg.popup_scrolled(res_1, title="All Program Sub-Outcome Grades of a Student Above 3")
-            sg.popup(f'\"All Program Sub-Outcome Grades of a Student Above 3\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
+            sg.popup_scrolled(res_1, title="List of Students Above 3 Average")
+            sg.popup(f'\"List of Students Above 3 Average\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
 
         elif event == 'List All Sub-Outcomes Under 3 Average by Students':
             res_1 = mp.list_all_sub_outcomes_under_3_avg_by_students(report_file=f"{values['-OUT-']}output-report.xlsx", student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])

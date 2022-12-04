@@ -61,7 +61,6 @@ def fill_report_df(df_list:list=None, output_df:pd.DataFrame=None, outputs_path:
                     with open(f"{outputs_path}error-log.txt", 'a+') as f:
                         f.write(f'Warning: Encountered a KeyError, missing \"{student_id}\"\n')
 
-    print(f"OUTPUT IS AT: {outputs_path}output-report.xlsx")
     output_df.to_excel(f'{outputs_path}output-report.xlsx')
     return output_df
 
@@ -78,8 +77,6 @@ def assemble_report_file(inputs_path:str='inputs/', student_ids_excel:str='resou
             else:
                 output_df = generate_empty_report_df(sub_outcome_df=sub_outcome_df, student_ids_excel=student_ids_excel)
             final_df = fill_report_df(df_list=df_list, output_df=output_df, outputs_path=outputs_path)
-
-            print(f"+++++++++ {grades_file} WAS PARSED SUCCESSFULLY +++++++++\n")
 
     if final_df is None:
         return 'Function returned a \"None\" type object, please check your paths!'

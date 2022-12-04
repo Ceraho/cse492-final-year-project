@@ -8,15 +8,16 @@ def main_gui():
 
     layout = [
         [sg.Text('Welcome to MUDEK Evaluation Tool!', font=('Times New Roman', 19, 'bold'))],
-        [sg.Text('Input Dir Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(default_text='inputs/', key='-IN-'), sg.FolderBrowse(initial_folder='inputs/')],
-        [sg.Text('Student IDs Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(default_text='resources/Student-ids-with-names.xlsx', key='-IN_STD-'), sg.FileBrowse(initial_folder='resources/Student-ids-with-names.xlsx', file_types=(("Excel Files", "*.xlsx"),))],
-        [sg.Text('Output Dir Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(default_text='outputs/', key='-OUT-'), sg.FolderBrowse(initial_folder='outputs/')],
+        [sg.Text('Input Dir Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(key='-IN-'), sg.FolderBrowse(initial_folder='inputs/')],
+        [sg.Text('Student IDs Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(key='-IN_STD-'), sg.FileBrowse(initial_folder='resources/', file_types=(("Excel Files", "*.xlsx"),))],
+        [sg.Text('Output Dir Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(key='-OUT-'), sg.FolderBrowse(initial_folder='outputs/')],
         [sg.Button('Generate Report', s=51)],
         [sg.Button('List of Students Above 3 Average', s=51)],
         [sg.Button('List All Sub-Outcomes Under 3 Average by Students', s=51)],
         [sg.Button('Min of All Sub-Outcomes by Lectures', s=51)],
         [sg.Button('Average of Program Sub-Outcomes by Lectures', s=51)],
         [sg.Button('Courses with a Sub-Outcome Average Below 3', s=51)],
+        [sg.Button('Help', s=51, button_color='green')],
         [sg.Exit(button_color='tomato', s=51)]
     ]
 
@@ -24,17 +25,31 @@ def main_gui():
 
     while True:
         event, values = window.read()
-        if values["-IN-"][-1] != "/":
-            values["-IN-"] += "/"
-        if values["-OUT-"][-1] != "/":
-            values["-OUT-"] += "/"
 
         if event in (sg.WIN_CLOSED, 'Exit'):
             break
 
-        elif event == 'Generate Report':
+        elif event == 'Help':
+            help_text = 'This tool is designed to process and evaluate grades of students\' performance within MUDEK standards\n\n' \
+                        'There are 3 paths required to run the evaluation process: Path of \"inputs\" directory, path to excel where the student ids and names are kept and path to an \"outputs\" directory\n\n' \
+                        'You MUST select these 3 paths before starting the evaluation process!\n\n' \
+                        'Please make sure that your Excel file(s)are in correct format before running the tool.'
+            sg.popup_scrolled(help_text, title='Help', font=('Times New Roman', 19, 'bold'))
+            continue
+
+        if not values["-IN-"] or not values["-OUT-"]:
+            sg.popup_error('Please choose proper path(s)', font=('Times New Roman', 19, 'bold'))
+
+        try:
+            if values["-IN-"][-1] != "/":
+                values["-IN-"] += "/"
+            if values["-OUT-"][-1] != "/":
+                values["-OUT-"] += "/"
+        except:
+            continue
+
+        if event == 'Generate Report':
             for x in os.listdir(values['-OUT-']):
-                print(f"Deleting {x} from output folder...")
                 os.remove(os.path.join(values['-OUT-'], x))
 
             mp.assemble_report_file(inputs_path=values['-IN-'], student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
@@ -70,6 +85,3 @@ def main_gui():
             sg.popup(f'\"Courses with a Sub-Outcome Average Below 3\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
 
     window.close()
-
-
-main_gui()

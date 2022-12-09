@@ -57,6 +57,9 @@ def fill_report_df(df_list:list=None, output_df:pd.DataFrame=None, outputs_path:
                     elif str(output_value).isnumeric:
                         if float(output_value) < float(input_value):
                             output_df.at[student_id, output_outcome] = input_df.at[student_id, sub_outcome]
+                    else:
+                        with open(f"{outputs_path}error-log.txt", 'a+') as f:
+                            f.write(f'Warning: Encountered an unexpected input while processing student: \"{student_id}\" and lecture-subOutcome: \"{output_outcome}\"\n')
                 except KeyError:
                     with open(f"{outputs_path}error-log.txt", 'a+') as f:
                         f.write(f'Warning: Encountered a KeyError, missing \"{student_id}\"\n')
@@ -74,6 +77,10 @@ def assemble_report_file(inputs_path:str='inputs/', student_ids_excel:str='resou
             sub_outcome_df, df_list = parse_grades_excels(grades_file=grades_file)
             if os.path.exists(f'{outputs_path}output-report.xlsx'):
                 output_df = pd.read_excel(f'{outputs_path}output-report.xlsx', index_col='Öğrenci No')
+                second_output_df = generate_empty_report_df(sub_outcome_df=sub_outcome_df, student_ids_excel=student_ids_excel)
+                cols_to_use = second_output_df.columns.difference(output_df.columns)
+                if not cols_to_use.empty:
+                    output_df = pd.merge(output_df, second_output_df[cols_to_use], left_index=True, right_index=True, how='outer')
             else:
                 output_df = generate_empty_report_df(sub_outcome_df=sub_outcome_df, student_ids_excel=student_ids_excel)
             final_df = fill_report_df(df_list=df_list, output_df=output_df, outputs_path=outputs_path)

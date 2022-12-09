@@ -7,7 +7,7 @@ def main_gui():
     sg.theme('Dark Blue 12')
 
     layout = [
-        [sg.Text('Welcome to MUDEK Evaluation Tool!', font=('Times New Roman', 19, 'bold'))],
+        [sg.Text('Welcome to Yeditepe University Computer Engineering Department\'s MUDEK Evaluation Tool!', font=('Times New Roman', 19, 'bold'))],
         [sg.Text('Input Dir Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(key='-IN-'), sg.FolderBrowse(initial_folder='inputs/')],
         [sg.Text('Student IDs Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(key='-IN_STD-'), sg.FileBrowse(initial_folder='resources/', file_types=(("Excel Files", "*.xlsx"),))],
         [sg.Text('Output Dir Path:', font=('Times New Roman', 17), s=13, justification='r'), sg.Input(key='-OUT-'), sg.FolderBrowse(initial_folder='outputs/')],
@@ -21,7 +21,7 @@ def main_gui():
         [sg.Exit(button_color='tomato', s=51)]
     ]
 
-    window = sg.Window('MUDEK Evaluation Tool', layout, font=('Times New Roman', 15), element_justification='c')
+    window = sg.Window('CSE Department MUDEK Evaluation Tool', layout, font=('Times New Roman', 15), element_justification='c')
 
     while True:
         event, values = window.read()

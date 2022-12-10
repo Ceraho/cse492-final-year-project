@@ -50,6 +50,9 @@ def fill_report_df(df_list:list=None, output_df:pd.DataFrame=None, outputs_path:
                     input_value = input_df.at[student_id, sub_outcome]
                     output_outcome = f'{sub_outcome}-{input_df.name}'
                     output_value = output_df.at[student_id, output_outcome]
+                    if not pd.isnull(input_value) and input_value not in (0, 1, 2, 3, 4, 5, 'B'):
+                        with open(f"{outputs_path}error-log.txt", 'a+') as f:
+                            f.write(f'Warning: Encountered an unexpected input while processing student: \"{student_id}\" and lecture-subOutcome: \"{output_outcome}\". Value can\'t be \"{input_value}\"\n')
                     if pd.isnull(output_value):
                         output_df.at[student_id, output_outcome] = input_df.at[student_id, sub_outcome]
                     elif str(output_value).isalpha():
@@ -57,9 +60,6 @@ def fill_report_df(df_list:list=None, output_df:pd.DataFrame=None, outputs_path:
                     elif str(output_value).isnumeric:
                         if float(output_value) < float(input_value):
                             output_df.at[student_id, output_outcome] = input_df.at[student_id, sub_outcome]
-                    else:
-                        with open(f"{outputs_path}error-log.txt", 'a+') as f:
-                            f.write(f'Warning: Encountered an unexpected input while processing student: \"{student_id}\" and lecture-subOutcome: \"{output_outcome}\"\n')
                 except KeyError:
                     with open(f"{outputs_path}error-log.txt", 'a+') as f:
                         f.write(f'Warning: Encountered a KeyError, missing \"{student_id}\"\n')
@@ -90,7 +90,12 @@ def assemble_report_file(inputs_path:str='inputs/', student_ids_excel:str='resou
     return final_df
 
 
-def list_students_above_3_avg(report_file:str='outputs/output-report.xlsx', student_ids_excel='resources/Student-ids-with-names.xlsx', outputs_path:str="outputs/"):
+def list_students_above_3_avg(report_file:str, student_ids_excel, outputs_path:str):
+    if not os.path.exists(report_file):
+        return "No report file to process, please generate a report first!"
+    if os.path.exists(f'{outputs_path}list_of_students_above_3_avg.xlsx'):
+        os.remove(f'{outputs_path}list_of_students_above_3_avg.xlsx')
+
     output_df = pd.read_excel(report_file, index_col='Öğrenci No')
     transposed_output_df = output_df.replace(to_replace='B', value=5.0)
 
@@ -111,7 +116,12 @@ def list_students_above_3_avg(report_file:str='outputs/output-report.xlsx', stud
     return merged_df
 
 
-def list_all_sub_outcomes_under_3_avg_by_students(report_file:str='outputs/output-report.xlsx', student_ids_excel='resources/Student-ids-with-names.xlsx', outputs_path:str="outputs/"):
+def list_all_sub_outcomes_under_3_avg_by_students(report_file:str, student_ids_excel, outputs_path:str):
+    if not os.path.exists(report_file):
+        return "No report file to process, please generate a report first!"
+    if os.path.exists(f'{outputs_path}list_all_sub_outcomes_under_3_avg_by_students.xlsx'):
+        os.remove(f'{outputs_path}list_all_sub_outcomes_under_3_avg_by_students.xlsx')
+
     output_df = pd.read_excel(report_file, index_col='Öğrenci No')
     output_df = output_df.replace(to_replace='B', value=5.0)
 
@@ -126,7 +136,12 @@ def list_all_sub_outcomes_under_3_avg_by_students(report_file:str='outputs/outpu
     return merged_df
 
 
-def min_of_all_sub_outcomes_by_lectures(report_file:str='outputs/output-report.xlsx', outputs_path:str="outputs/"):
+def min_of_all_sub_outcomes_by_lectures(report_file:str, outputs_path:str):
+    if not os.path.exists(report_file):
+        return "No report file to process, please generate a report first!"
+    if os.path.exists(f'{outputs_path}min_of_all_sub_outcomes_by_lectures.xlsx'):
+        os.remove(f'{outputs_path}min_of_all_sub_outcomes_by_lectures.xlsx')
+
     output_df = pd.read_excel(report_file, index_col='Öğrenci No')
     output_df = output_df.replace(to_replace='B', value=5.0)
 
@@ -152,7 +167,12 @@ def min_of_all_sub_outcomes_by_lectures(report_file:str='outputs/output-report.x
     return result_df
 
 
-def avg_of_all_sub_outcomes_by_lectures(report_file:str='outputs/output-report.xlsx', outputs_path:str="outputs/"):
+def avg_of_all_sub_outcomes_by_lectures(report_file:str, outputs_path:str):
+    if not os.path.exists(report_file):
+        return "No report file to process, please generate a report first!"
+    if os.path.exists(f'{outputs_path}avg_of_all_lectures.xlsx'):
+        os.remove(f'{outputs_path}avg_of_all_lectures.xlsx')
+
     output_df = pd.read_excel(report_file, index_col='Öğrenci No')
     output_df = output_df.replace(to_replace='B', value=5.0)
 
@@ -178,7 +198,12 @@ def avg_of_all_sub_outcomes_by_lectures(report_file:str='outputs/output-report.x
     return result_df
 
 
-def list_all_lectures_under_3_avg(report_file:str='outputs/output-report.xlsx', outputs_path:str="outputs/"):
+def list_all_lectures_under_3_avg(report_file:str, outputs_path:str):
+    if not os.path.exists(report_file):
+        return "No report file to process, please generate a report first!"
+    if os.path.exists(f'{outputs_path}list_of_lectures_under_3_avg.xlsx'):
+        os.remove(f'{outputs_path}list_of_lectures_under_3_avg.xlsx')
+
     oc_lec_ave_df = avg_of_all_sub_outcomes_by_lectures(report_file)
     final_df = oc_lec_ave_df[oc_lec_ave_df < 3].dropna(how='all', axis=0).dropna(how='all', axis=1)
 

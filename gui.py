@@ -49,8 +49,10 @@ def main_gui():
             continue
 
         if event == 'Generate Report':
-            for x in os.listdir(values['-OUT-']):
-                os.remove(os.path.join(values['-OUT-'], x))
+            if os.path.exists(f"{values['-OUT-']}output-report.xlsx"):
+                os.remove(f"{values['-OUT-']}output-report.xlsx")
+            if os.path.exists(f"{values['-OUT-']}error-log.txt"):
+                os.remove(f"{values['-OUT-']}error-log.txt")
 
             mp.assemble_report_file(inputs_path=values['-IN-'], student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
 
@@ -60,28 +62,28 @@ def main_gui():
             sg.popup('Report generated, you can continue with desired query(s).', font=('Times New Roman', 19, 'bold'))
 
         elif event == 'List of Students Above 3 Average':
-            res_1 = mp.list_students_above_3_avg(report_file=f"{values['-OUT-']}output-report.xlsx", student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
-            sg.popup_scrolled(res_1, title="List of Students Above 3 Average")
+            res = mp.list_students_above_3_avg(report_file=f"{values['-OUT-']}output-report.xlsx", student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
+            sg.popup_scrolled(res, title="List of Students Above 3 Average")
             sg.popup(f'\"List of Students Above 3 Average\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
 
         elif event == 'List All Sub-Outcomes Under 3 Average by Students':
-            res_1 = mp.list_all_sub_outcomes_under_3_avg_by_students(report_file=f"{values['-OUT-']}output-report.xlsx", student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
-            sg.popup_scrolled(res_1, title="List All Sub-Outcomes Under 3 Average by Students")
+            res = mp.list_all_sub_outcomes_under_3_avg_by_students(report_file=f"{values['-OUT-']}output-report.xlsx", student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
+            sg.popup_scrolled(res, title="List All Sub-Outcomes Under 3 Average by Students")
             sg.popup(f'\"List All Sub-Outcomes Under 3 Average by Students\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
 
         elif event == 'Min of All Sub-Outcomes by Lectures':
-            res_1 = mp.min_of_all_sub_outcomes_by_lectures(report_file=f"{values['-OUT-']}output-report.xlsx", outputs_path=values['-OUT-'])
-            sg.popup_scrolled(res_1, title="Min of All Sub-Outcomes by Lectures")
+            res = mp.min_of_all_sub_outcomes_by_lectures(report_file=f"{values['-OUT-']}output-report.xlsx", outputs_path=values['-OUT-'])
+            sg.popup_scrolled(res, title="Min of All Sub-Outcomes by Lectures")
             sg.popup(f'\"Min of All Sub-Outcomes by Lectures\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
 
         elif event == 'Average of Program Sub-Outcomes by Lectures':
-            res_2 = mp.avg_of_all_sub_outcomes_by_lectures(report_file=f"{values['-OUT-']}output-report.xlsx", outputs_path=values['-OUT-'])
-            sg.popup_scrolled(res_2, title="Average of Program Sub-Outcomes by Lectures")
+            res = mp.avg_of_all_sub_outcomes_by_lectures(report_file=f"{values['-OUT-']}output-report.xlsx", outputs_path=values['-OUT-'])
+            sg.popup_scrolled(res, title="Average of Program Sub-Outcomes by Lectures")
             sg.popup(f'\"Average of Program Sub-Outcomes by Lectures\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
 
         elif event == 'Courses with a Sub-Outcome Average Below 3':
-            res_3 = mp.list_all_lectures_under_3_avg(report_file=f"{values['-OUT-']}output-report.xlsx", outputs_path=values['-OUT-'])
-            sg.popup_scrolled(res_3, title="Courses with a Sub-Outcome Average Below 3")
+            res = mp.list_all_lectures_under_3_avg(report_file=f"{values['-OUT-']}output-report.xlsx", outputs_path=values['-OUT-'])
+            sg.popup_scrolled(res, title="Courses with a Sub-Outcome Average Below 3")
             sg.popup(f'\"Courses with a Sub-Outcome Average Below 3\" process is done. Please check the \"{values["-OUT-"]}\" directory.', font=('Times New Roman', 19, 'bold'), title="")
 
     window.close()

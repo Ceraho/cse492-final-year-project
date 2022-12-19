@@ -49,6 +49,13 @@ def main_gui():
             continue
 
         if event == 'Generate Report':
+            for fname in os.listdir(f"{values['-IN-']}"):
+                if fname.endswith('.xlsx'):
+                    break
+            else:
+                sg.popup_error('Current input directory path has no .xlsx file, please make sure that you have set the correct directory.', font=('Times New Roman', 19, 'bold'))
+                continue
+
             if os.path.exists(f"{values['-OUT-']}output-report.xlsx"):
                 os.remove(f"{values['-OUT-']}output-report.xlsx")
             if os.path.exists(f"{values['-OUT-']}error-log.txt"):

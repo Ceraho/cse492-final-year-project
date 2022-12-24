@@ -204,7 +204,7 @@ def list_all_lectures_under_3_avg(report_file:str, outputs_path:str):
     if os.path.exists(f'{outputs_path}list_of_lectures_under_3_avg.xlsx'):
         os.remove(f'{outputs_path}list_of_lectures_under_3_avg.xlsx')
 
-    oc_lec_ave_df = avg_of_all_sub_outcomes_by_lectures(report_file)
+    oc_lec_ave_df = avg_of_all_sub_outcomes_by_lectures(report_file, outputs_path)
     final_df = oc_lec_ave_df[oc_lec_ave_df < 3].dropna(how='all', axis=0).dropna(how='all', axis=1)
 
     final_df.to_excel(f'{outputs_path}list_of_lectures_under_3_avg.xlsx')

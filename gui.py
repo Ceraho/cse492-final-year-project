@@ -61,7 +61,10 @@ def main_gui():
             if os.path.exists(f"{values['-OUT-']}error-log.txt"):
                 os.remove(f"{values['-OUT-']}error-log.txt")
 
-            mp.assemble_report_file(inputs_path=values['-IN-'], student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
+            result = mp.assemble_report_file(inputs_path=values['-IN-'], student_ids_excel=values['-IN_STD-'], outputs_path=values['-OUT-'])
+            if "ERROR" in result:
+                sg.popup_error("Check \"Error-log.txt\", please.")
+                continue
 
             if os.path.exists(f"{values['-OUT-']}error-log.txt"):
                 sg.popup_error('Please check \"outputs/error-log.txt\"', font=('Times New Roman', 19, 'bold'))

@@ -7,15 +7,27 @@ pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 
 
-def parse_grades_excels(grades_file:str):
+def parse_grades_excels(grades_file:str, outputs_path:str):
     input_file = pd.ExcelFile(grades_file)
 
     df_list = []
     for current_sheet in input_file.sheet_names:
         if current_sheet == input_file.sheet_names[0]:
-            sub_outcome_df = pd.read_excel(input_file, sheet_name=current_sheet).drop(columns='Program Alt-Çıktıları')
-            continue
-        df_list.append(pd.read_excel(input_file, sheet_name=current_sheet, index_col='Öğrenci No'))
+            try:
+                sub_outcome_df = pd.read_excel(input_file, sheet_name=current_sheet).drop(columns='Program Alt-Çıktıları')
+                continue
+            except KeyError:
+                with open(f"{outputs_path}error-log.txt", 'a+') as f:
+                    f.write(f"\"Program Alt-Çıktıları\" Column of file {grades_file} was written incorrectly, please check that column before trying again.\n")
+                    return False, "ERROR: Check error-log, please."
+
+        try:
+            df_list.append(pd.read_excel(input_file, sheet_name=current_sheet, index_col='Öğrenci No'))
+        except ValueError:
+            with open(f"{outputs_path}error-log.txt", 'a+') as f:
+                f.write(f"\"Öğrenci No\" Column of file {grades_file} was written incorrectly, please check those columns before trying again.\n")
+            return False, "ERROR: Check error-log, please."
+
         for col in df_list[-1].columns:
             if not re.search(r'[0-9][a-zA-Z]', col):
                 df_list[-1].drop(columns=col, inplace=True)
@@ -74,7 +86,9 @@ def assemble_report_file(inputs_path:str='inputs/', student_ids_excel:str='resou
         if input_file.endswith('.xlsx'):
             grades_file = os.path.join(inputs_path, input_file)
 
-            sub_outcome_df, df_list = parse_grades_excels(grades_file=grades_file)
+            sub_outcome_df, df_list = parse_grades_excels(grades_file=grades_file, outputs_path=outputs_path)
+            if sub_outcome_df is False:
+                return df_list
             if os.path.exists(f'{outputs_path}output-report.xlsx'):
                 output_df = pd.read_excel(f'{outputs_path}output-report.xlsx', index_col='Öğrenci No')
                 second_output_df = generate_empty_report_df(sub_outcome_df=sub_outcome_df, student_ids_excel=student_ids_excel)

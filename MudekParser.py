@@ -164,17 +164,18 @@ def min_of_all_sub_outcomes_by_lectures(report_file:str, outputs_path:str):
     lec_oc_val_dict = dict()
 
     for col in output_df.columns:
-        x = re.search(r'([0-9]+[a-z]{1})-(CSE[0-9]{3}|GBE[0-9]{3})', col)
-        set_of_lecs.add(x.group(2))
-        set_of_outcomes.add(x.group(1))
-        lec_oc_val_dict[x.group(0)] = output_df[col].min()
+        x = col.split("-")
+        set_of_lecs.add(x[1])
+        set_of_outcomes.add(x[0])
+        lec_oc_val_dict[col] = output_df[col].min()
 
     result_df = pd.DataFrame(index=list(set_of_outcomes), columns=list(set_of_lecs))
 
     for i in result_df.index:
         for c in result_df.columns:
             for key, val in lec_oc_val_dict.items():
-                if i in key and c in key:
+                split_key = key.split("-")
+                if i == split_key[0] and c == split_key[1]:
                     result_df.at[i, c] = val
 
     result_df.to_excel(f'{outputs_path}min_of_all_sub_outcomes_by_lectures.xlsx')
@@ -195,17 +196,18 @@ def avg_of_all_sub_outcomes_by_lectures(report_file:str, outputs_path:str):
     lec_oc_val_dict = dict()
 
     for col in output_df.columns:
-        x = re.search(r'([0-9]+[a-z]{1})-(CSE[0-9]{3}|GBE[0-9]{3})', col)
-        set_of_lecs.add(x.group(2))
-        set_of_outcomes.add(x.group(1))
-        lec_oc_val_dict[x.group(0)] = output_df[col].mean()
+        x = col.split("-")
+        set_of_lecs.add(x[1])
+        set_of_outcomes.add(x[0])
+        lec_oc_val_dict[col] = output_df[col].mean()
 
     result_df = pd.DataFrame(index=list(set_of_outcomes), columns=list(set_of_lecs))
 
     for i in result_df.index:
         for c in result_df.columns:
             for key, val in lec_oc_val_dict.items():
-                if i in key and c in key:
+                split_key = key.split("-")
+                if i == split_key[0] and c == split_key[1]:
                     result_df.at[i, c] = val
 
     result_df.to_excel(f'{outputs_path}avg_of_all_lectures.xlsx')
